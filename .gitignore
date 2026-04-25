@@ -1,0 +1,53 @@
+# Flutter
+build/
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+.pub-cache/
+.pub/
+ephemeral/
+.idea/
+.vscode/
+
+# Rust
+target/
+**/*.rs.bk
+Cargo.lock
+
+# iOS
+ios/Pods/
+ios/.symlinks/
+ios/Flutter/Flutter.framework
+ios/Flutter/Flutter.podspec
+ios/Runner.xcworkspace/xcuserdata/
+ios/Runner.xcodeproj/xcuserdata/
+*.ipa
+*.xcframework
+
+# Android
+android/.gradle/
+android/local.properties
+android/key.properties
+android/app/upload-keystore.jks
+android/app/release/
+*.apk
+*.aab
+*.jks
+*.keystore
+
+# Generated bridge
+lib/src/rust/frb_generated.dart
+lib/src/rust/frb_generated.io.dart
+lib/src/rust/frb_generated.web.dart
+
+# Secrets
+*.p8
+*.p12
+*.mobileprovision
+.env
+.env.*
+
+# OS
+.DS_Store
+Thumbs.db
