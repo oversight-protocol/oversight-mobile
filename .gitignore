@@ -13,7 +13,8 @@ ephemeral/
 # Rust
 target/
 **/*.rs.bk
-Cargo.lock
+# Cargo.lock is committed (FFI crate, reproducible builds matter)
+android-jniLibs/  # cargokit rebuilds these at app build time
 
 # iOS
 ios/Pods/
@@ -36,10 +37,8 @@ android/app/release/
 *.jks
 *.keystore
 
-# Generated bridge
-lib/src/rust/frb_generated.dart
-lib/src/rust/frb_generated.io.dart
-lib/src/rust/frb_generated.web.dart
+# FRB-generated Dart bindings are committed so fresh clones build without
+# needing flutter_rust_bridge_codegen installed locally.
 
 # Secrets
 *.p8

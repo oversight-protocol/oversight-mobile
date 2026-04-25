@@ -1,0 +1,34 @@
+[package]
+name = "rust_lib_oversight"
+version = "0.1.0"
+edition = "2021"
+license = "Apache-2.0"
+description = "Verifier-only FFI surface for Oversight mobile apps. Embeds the Oversight Rust core unchanged."
+
+[lib]
+name = "rust_lib_oversight"
+crate-type = ["staticlib", "cdylib"]
+
+[dependencies]
+# Oversight core — verifier-relevant crates only. NO seal/sign/registry-server in the mobile API.
+oversight-crypto = { path = "../../oversight-gh/oversight-rust/oversight-crypto" }
+oversight-manifest = { path = "../../oversight-gh/oversight-rust/oversight-manifest" }
+oversight-container = { path = "../../oversight-gh/oversight-rust/oversight-container" }
+oversight-tlog = { path = "../../oversight-gh/oversight-rust/oversight-tlog" }
+oversight-rekor = { path = "../../oversight-gh/oversight-rust/oversight-rekor" }
+oversight-watermark = { path = "../../oversight-gh/oversight-rust/oversight-watermark" }
+oversight-policy = { path = "../../oversight-gh/oversight-rust/oversight-policy" }
+
+flutter_rust_bridge = "=2.12.0"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+thiserror = "1"
+
+[dev-dependencies]
+hex = "0.4"
+
+[profile.release]
+lto = true
+codegen-units = 1
+strip = true
+opt-level = "z"
