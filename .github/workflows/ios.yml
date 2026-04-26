@@ -98,6 +98,10 @@ jobs:
           # cert + provisioning profile on demand using the API key — no Mac,
           # no manual cert management, no fastlane match repo needed.
           cd ios
+          # Note: do NOT pass CODE_SIGN_IDENTITY here — it cascades to Pod
+          # targets which only sign for Development. xcodebuild's automatic
+          # signing picks Distribution for the Runner archive scheme on its
+          # own, while Pods retain their per-target development signing.
           xcodebuild archive \
             -workspace Runner.xcworkspace \
             -scheme Runner \
@@ -109,8 +113,7 @@ jobs:
             -authenticationKeyID "$API_KEY_ID" \
             -authenticationKeyIssuerID "$API_ISSUER_ID" \
             DEVELOPMENT_TEAM="$TEAM_ID" \
-            CODE_SIGN_STYLE=Automatic \
-            "CODE_SIGN_IDENTITY=Apple Distribution"
+            CODE_SIGN_STYLE=Automatic
 
           # Export signed IPA from the archive
           xcodebuild -exportArchive \
