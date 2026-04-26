@@ -4,6 +4,10 @@
 <dict>
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Oversight does not access your photo library. This entry exists because a transitive dependency declares the photo-library API; the app itself only verifies cryptographic bundles.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>Oversight does not use the camera. This entry exists because a transitive dependency declares the camera API; the app itself only verifies cryptographic bundles.</string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
