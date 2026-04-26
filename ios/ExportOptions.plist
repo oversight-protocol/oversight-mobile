@@ -9,7 +9,7 @@
 	<key>teamID</key>
 	<string>__TEAM_ID__</string>
 	<key>signingCertificate</key>
-	<string>iOS Distribution</string>
+	<string>Apple Distribution</string>
 	<key>provisioningProfiles</key>
 	<dict>
 		<key>com.oversightprotocol.oversight</key>
