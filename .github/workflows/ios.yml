@@ -84,26 +84,45 @@ jobs:
           API_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_API_ISSUER_ID }}
           TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
         run: |
-          # Render ExportOptions.plist with team ID injected
-          cat > ios/ExportOptions.plist <<EOF
-          <?xml version="1.0" encoding="UTF-8"?>
-          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-          <plist version="1.0">
-          <dict>
-            <key>method</key><string>app-store</string>
-            <key>teamID</key><string>${TEAM_ID}</string>
-            <key>signingStyle</key><string>automatic</string>
-            <key>uploadBitcode</key><false/>
-            <key>uploadSymbols</key><true/>
-            <key>destination</key><string>upload</string>
-          </dict>
-          </plist>
-          EOF
+          set -euo pipefail
+          API_KEY_PATH=~/.appstoreconnect/private_keys/AuthKey_${API_KEY_ID}.p8
 
-          flutter build ipa --release --export-options-plist=ios/ExportOptions.plist
+          # Inject team ID into the committed ExportOptions.plist
+          /usr/bin/sed -i "" "s/__TEAM_ID__/${TEAM_ID}/g" ios/ExportOptions.plist
 
-          # Find the produced .ipa and upload via App Store Connect API
-          IPA_PATH=$(find build/ios/ipa -name '*.ipa' | head -1)
+          # Build .app without signing (Flutter assembles, xcodebuild signs)
+          flutter build ios --release --no-codesign
+
+          # Archive with automatic signing via App Store Connect API key.
+          # -allowProvisioningUpdates lets xcodebuild create the distribution
+          # cert + provisioning profile on demand using the API key — no Mac,
+          # no manual cert management, no fastlane match repo needed.
+          cd ios
+          xcodebuild archive \
+            -workspace Runner.xcworkspace \
+            -scheme Runner \
+            -configuration Release \
+            -archivePath build/Runner.xcarchive \
+            -destination "generic/platform=iOS" \
+            -allowProvisioningUpdates \
+            -authenticationKeyPath "$API_KEY_PATH" \
+            -authenticationKeyID "$API_KEY_ID" \
+            -authenticationKeyIssuerID "$API_ISSUER_ID" \
+            DEVELOPMENT_TEAM="$TEAM_ID" \
+            CODE_SIGN_STYLE=Automatic \
+            "CODE_SIGN_IDENTITY=Apple Distribution"
+
+          # Export signed IPA from the archive
+          xcodebuild -exportArchive \
+            -archivePath build/Runner.xcarchive \
+            -exportOptionsPlist ExportOptions.plist \
+            -exportPath build/ipa \
+            -allowProvisioningUpdates \
+            -authenticationKeyPath "$API_KEY_PATH" \
+            -authenticationKeyID "$API_KEY_ID" \
+            -authenticationKeyIssuerID "$API_ISSUER_ID"
+
+          IPA_PATH=$(find build/ipa -name '*.ipa' | head -1)
           echo "Uploading $IPA_PATH"
           xcrun altool --upload-app \
             --type ios \
