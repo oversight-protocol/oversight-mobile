@@ -17,18 +17,31 @@ Mobile companion to the [Oversight Protocol](https://github.com/oversight-protoc
 - Not free of platform middlemen (Apple and Google control the stores; F-Droid and reproducible builds are the trustless path — see [BUILD.md](docs/BUILD.md))
 - Not a content-publishing app — verification only in v1, signing comes in v2 with hardware-backed keys
 
-## How to install
+## Status
 
-| Platform | Where | Status |
+| Platform | Channel | Status |
 |---|---|---|
-| iOS | TestFlight, App Store | 🚧 in development |
-| Android | Google Play | 🚧 in development |
-| Android (no Google) | F-Droid | 🚧 planned |
-| Anyone | GitHub Releases (`.apk` + reproducible build manifest) | 🚧 planned |
+| iOS | TestFlight (internal) | **Live — v0.1.11** |
+| iOS | App Store | After internal beta passes external review |
+| Android | Internal track / debug APK | **Live — v0.1.11** |
+| Android | Google Play | After internal beta |
+| Android (no Google) | F-Droid | Planned |
+| Anyone | GitHub Releases (`.apk` + reproducible build manifest) | Planned |
+
+The current internal beta is closed (single-tester) while I shake out platform-specific issues. External TestFlight invitations open after the iOS 26 SDK migration settles and the export-compliance plumbing is clean.
+
+## How it's built
+
+- **Flutter** for the UI layer (Dart, single codebase, both platforms)
+- **Rust** for the verification core, embedded via [`flutter_rust_bridge`](https://github.com/fzyzcjy/flutter_rust_bridge). The same `oversight-rust` crates that power the desktop CLI are linked into the mobile binary, so a manifest that verifies on a laptop verifies the same way on your phone — there is no second implementation to drift
+- **iOS** builds run on GitHub-hosted macOS runners (`macos-26`, Xcode 26, iOS 26 SDK). No local Mac is required for the project — everything from cert import to TestFlight upload is reproducible from CI
+- **Android** builds run locally and on CI; release AABs are signed with a PKCS12 upload keystore that lives outside the repo
 
 ## How to verify the app itself
 
-Reproducible builds are coming. When live, you'll be able to clone this repo, run one command, and confirm the binary on the App Store / Play Store / F-Droid is byte-identical to what you built locally. That's how trust actually works.
+Reproducible builds are coming. When live, you will be able to clone this repo, run one command, and confirm the binary on the App Store / Play Store / F-Droid is byte-identical to what you built locally. That is how trust actually works.
+
+Until reproducible builds land, the most honest fallback is the source of truth in this repo: every release is tagged, every tag has a matching CI run, and every CI run uploads its artifacts. You can read the workflow yourself in [`.github/workflows/`](.github/workflows/).
 
 ## License
 
