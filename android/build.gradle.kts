@@ -19,33 +19,21 @@ subprojects {
     project.evaluationDependsOn(":app")
 }
 
-// Force Java 17 across all Flutter plugin subprojects so plugins like
-// receive_sharing_intent (which compile Kotlin at JVM target 17) don't
-// trip over the default Java 1.8 compile setting from older Flutter
-// plugin templates. plugins.withId fires when the plugin is applied —
-// no afterEvaluate, no double-evaluation crashes.
+// Force Java 17 + Kotlin JVM 17 across all Flutter plugin subprojects so
+// plugins like receive_sharing_intent (which compile Kotlin at JVM target 17)
+// don't trip over the default Java 1.8 from older Flutter plugin templates.
+//
+// We configure the compile *tasks* directly rather than the AGP extension —
+// the extension's compileOptions get finalized early and reject late writes
+// with 'sourceCompatibility has been finalized'.
 subprojects {
-    plugins.withId("com.android.library") {
-        extensions.configure<com.android.build.gradle.LibraryExtension>("android") {
-            compileOptions {
-                sourceCompatibility = JavaVersion.VERSION_17
-                targetCompatibility = JavaVersion.VERSION_17
-            }
-        }
+    tasks.withType<JavaCompile>().configureEach {
+        sourceCompatibility = "17"
+        targetCompatibility = "17"
     }
-    plugins.withId("com.android.application") {
-        extensions.configure<com.android.build.gradle.AppExtension>("android") {
-            compileOptions {
-                sourceCompatibility = JavaVersion.VERSION_17
-                targetCompatibility = JavaVersion.VERSION_17
-            }
-        }
-    }
-    plugins.withId("org.jetbrains.kotlin.android") {
-        extensions.configure<org.jetbrains.kotlin.gradle.dsl.KotlinAndroidProjectExtension>("kotlin") {
-            compilerOptions {
-                jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
-            }
+    tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
+        compilerOptions {
+            jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
         }
     }
 }
