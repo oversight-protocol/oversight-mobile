@@ -12,7 +12,6 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
-import 'package:receive_sharing_intent/receive_sharing_intent.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -236,20 +235,12 @@ class _HomePageState extends State<HomePage> {
   bool _busy = false;
   String? _error;
   List<HistoryEntry> _history = [];
-  StreamSubscription<List<SharedMediaFile>>? _intentSub;
 
   @override
   void initState() {
     super.initState();
     _loadVersion();
     _loadHistory();
-    _wireFileOpenIntent();
-  }
-
-  @override
-  void dispose() {
-    _intentSub?.cancel();
-    super.dispose();
   }
 
   Future<void> _loadVersion() async {
@@ -291,26 +282,6 @@ class _HomePageState extends State<HomePage> {
     if (mounted) setState(() => _history = []);
   }
 
-  void _wireFileOpenIntent() {
-    if (!(Platform.isIOS || Platform.isAndroid)) return;
-    _intentSub = ReceiveSharingIntent.instance.getMediaStream().listen(
-      (files) => _handleSharedFiles(files),
-      onError: (_) {},
-    );
-    ReceiveSharingIntent.instance.getInitialMedia().then((files) {
-      if (files.isNotEmpty) _handleSharedFiles(files);
-      ReceiveSharingIntent.instance.reset();
-    }).catchError((_) {});
-  }
-
-  void _handleSharedFiles(List<SharedMediaFile> files) {
-    if (files.isEmpty) return;
-    final f = files.first;
-    final path = f.path;
-    if (path.isEmpty) return;
-    _verifyFromPath(path, fileName: _basename(path));
-  }
-
   Future<void> _pickAndVerify() async {
     setState(() {
       _busy = true;
@@ -332,23 +303,6 @@ class _HomePageState extends State<HomePage> {
       }
       if (bytes == null) throw 'could not read picked file';
       await _verify(bytes, file.name);
-    } catch (e) {
-      if (!mounted) return;
-      setState(() {
-        _error = e.toString();
-        _busy = false;
-      });
-    }
-  }
-
-  Future<void> _verifyFromPath(String path, {String? fileName}) async {
-    setState(() {
-      _busy = true;
-      _error = null;
-    });
-    try {
-      final bytes = await File(path).readAsBytes();
-      await _verify(bytes, fileName ?? _basename(path));
     } catch (e) {
       if (!mounted) return;
       setState(() {
@@ -566,11 +520,6 @@ class _HomePageState extends State<HomePage> {
       ),
     );
   }
-}
-
-String _basename(String path) {
-  final i = path.lastIndexOf('/');
-  return i >= 0 ? path.substring(i + 1) : path;
 }
 
 // -------------------------------------------------------------- Components
