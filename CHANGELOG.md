@@ -2,6 +2,26 @@
 
 All notable changes to the Oversight verifier app for iOS and Android.
 
+## [0.1.9] — 2026-04-26 (Android unblock)
+
+### Removed
+- `receive_sharing_intent` dependency. The plugin compiles its Kotlin at JVM 17 while older Flutter plugin templates leave Java at 1.8, producing `Inconsistent JVM-target compatibility` on Android release builds. Every workaround (`afterEvaluate`, `plugins.withId`, task-level `JavaCompile`/`KotlinCompile` config, `jvmToolchain(17)`) hit a different gradle finalize-order error (`sourceCompatibility has been finalized`, `languageVersion is final`, …). Cut the dep to unblock; Android tap-to-auto-verify deferred.
+
+### Notes
+- iOS still ships `CFBundleDocumentTypes` + `UTExportedTypeDeclarations` so `.oversight` files appear under "Open With" in Files / Mail / AirDrop — user picks the file with **Verify a bundle** from there.
+- Android still ships VIEW + SEND intent filters; harmless without a Flutter handler, ready for re-wiring with a smaller dep (likely `app_links`) in a future release.
+
+## [0.1.6] — 2026-04-26 (sample fix + gradle pattern)
+
+### Fixed
+- **Tampered sample bundle now actually fails verification.** The previous `assets/samples/sample_tampered.oversight` flipped a byte in the ciphertext region, which the verifier (manifest-signature only) doesn't validate, so on TestFlight v0.1.4 the "Try sample (tampered)" button was incorrectly showing **VERIFIED**. Re-tampered with a byte flip inside the manifest's `content_hash` value so manifest-signature validation actually fails.
+- Android gradle: replaced the `afterEvaluate { ... }` JVM-17 patch with `plugins.withId(...) { ... }` to avoid `Cannot run Project.afterEvaluate(Action) when the project is already evaluated`. (Later removed entirely in 0.1.9.)
+
+## [0.1.5] / [0.1.4] — 2026-04-26 (Android plumbing iterations)
+
+### Fixed
+- Android: `receive_sharing_intent` plugin's Kotlin/JVM target mismatch with older Flutter plugin Java target. Iterated through deprecated/modern Kotlin DSLs and gradle finalization races; ultimately resolved in 0.1.9 by dropping the plugin.
+
 ## [0.1.3] — 2026-04-26 (UX hardening)
 
 ### Added
