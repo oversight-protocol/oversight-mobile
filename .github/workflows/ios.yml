@@ -71,8 +71,9 @@ jobs:
           API_KEY_ID_RAW: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
         run: |
           mkdir -p ~/.appstoreconnect/private_keys
-          # Strip any trailing CRLF the secret may carry from PowerShell push
-          KEY_ID=$(printf %s "$API_KEY_ID_RAW" | tr -d '\r\n ')
+          # PowerShell adds UTF-8 BOM (3 bytes) when piping strings into gh
+          # secret set, so strip everything that isn't printable ASCII.
+          KEY_ID=$(printf %s "$API_KEY_ID_RAW" | tr -cd '[:print:]')
           echo "$API_KEY_BASE64" | base64 -d > ~/.appstoreconnect/private_keys/AuthKey_${KEY_ID}.p8
           ls -la ~/.appstoreconnect/private_keys/
 
@@ -103,10 +104,11 @@ jobs:
           echo "API_KEY_ID len:    $(printf %s "$API_KEY_ID"    | wc -c) (want 10)"
           echo "API_ISSUER_ID len: $(printf %s "$API_ISSUER_ID" | wc -c) (want 36)"
           echo "TEAM_ID len:       $(printf %s "$TEAM_ID"       | wc -c) (want 10)"
-          # Strip any trailing whitespace defensively (handles PowerShell CRLF)
-          API_KEY_ID=$(printf %s "$API_KEY_ID" | tr -d '\r\n ')
-          API_ISSUER_ID=$(printf %s "$API_ISSUER_ID" | tr -d '\r\n ')
-          TEAM_ID=$(printf %s "$TEAM_ID" | tr -d '\r\n ')
+          # PowerShell pushes secrets with a UTF-8 BOM prefix; keep only
+          # printable ASCII so the .p8 path resolves and JWT claims are clean.
+          API_KEY_ID=$(printf %s "$API_KEY_ID" | tr -cd '[:print:]')
+          API_ISSUER_ID=$(printf %s "$API_ISSUER_ID" | tr -cd '[:print:]')
+          TEAM_ID=$(printf %s "$TEAM_ID" | tr -cd '[:print:]')
           echo "After strip: KEY_ID=$(printf %s "$API_KEY_ID" | wc -c)  ISSUER_ID=$(printf %s "$API_ISSUER_ID" | wc -c)  TEAM_ID=$(printf %s "$TEAM_ID" | wc -c)"
           export API_KEY_ID API_ISSUER_ID TEAM_ID
           export API_KEY_PATH=~/.appstoreconnect/private_keys/AuthKey_${API_KEY_ID}.p8
