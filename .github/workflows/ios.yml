@@ -77,61 +77,34 @@ jobs:
         run: |
           flutter build ios --release --no-codesign
 
-      - name: Build signed IPA + upload to TestFlight (tags only)
+      - name: Setup Ruby + Fastlane
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.2'
+          bundler-cache: true
+          working-directory: ios
+
+      - name: Build + sign + upload via Fastlane (tags only)
         if: startsWith(github.ref, 'refs/tags/v')
         env:
           API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
           API_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_API_ISSUER_ID }}
           TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          FASTLANE_HIDE_CHANGELOG: "1"
+          FASTLANE_DISABLE_COLORS: "1"
         run: |
           set -euo pipefail
-          API_KEY_PATH=~/.appstoreconnect/private_keys/AuthKey_${API_KEY_ID}.p8
+          export API_KEY_PATH=~/.appstoreconnect/private_keys/AuthKey_${API_KEY_ID}.p8
 
-          # Inject team ID into the committed ExportOptions.plist
-          /usr/bin/sed -i "" "s/__TEAM_ID__/${TEAM_ID}/g" ios/ExportOptions.plist
-
-          # Build .app without signing (Flutter assembles, xcodebuild signs)
+          # Flutter assembles the .app first; Fastlane gym handles archive + sign + export
           flutter build ios --release --no-codesign
 
-          # Archive with automatic signing via App Store Connect API key.
-          # -allowProvisioningUpdates lets xcodebuild create the distribution
-          # cert + provisioning profile on demand using the API key — no Mac,
-          # no manual cert management, no fastlane match repo needed.
+          # Fastlane appstore lane: cert + sigh + gym + pilot
+          # cert/sigh use ASC API v1 endpoints which actually work with the API key,
+          # bypassing xcodebuild's flaky DVTPortal auth.
           cd ios
-          # Note: do NOT pass CODE_SIGN_IDENTITY here — it cascades to Pod
-          # targets which only sign for Development. xcodebuild's automatic
-          # signing picks Distribution for the Runner archive scheme on its
-          # own, while Pods retain their per-target development signing.
-          xcodebuild archive \
-            -workspace Runner.xcworkspace \
-            -scheme Runner \
-            -configuration Release \
-            -archivePath build/Runner.xcarchive \
-            -destination "generic/platform=iOS" \
-            -allowProvisioningUpdates \
-            -authenticationKeyPath "$API_KEY_PATH" \
-            -authenticationKeyID "$API_KEY_ID" \
-            -authenticationKeyIssuerID "$API_ISSUER_ID" \
-            DEVELOPMENT_TEAM="$TEAM_ID" \
-            CODE_SIGN_STYLE=Automatic
-
-          # Export signed IPA from the archive
-          xcodebuild -exportArchive \
-            -archivePath build/Runner.xcarchive \
-            -exportOptionsPlist ExportOptions.plist \
-            -exportPath build/ipa \
-            -allowProvisioningUpdates \
-            -authenticationKeyPath "$API_KEY_PATH" \
-            -authenticationKeyID "$API_KEY_ID" \
-            -authenticationKeyIssuerID "$API_ISSUER_ID"
-
-          IPA_PATH=$(find build/ipa -name '*.ipa' | head -1)
-          echo "Uploading $IPA_PATH"
-          xcrun altool --upload-app \
-            --type ios \
-            --file "$IPA_PATH" \
-            --apiKey "$API_KEY_ID" \
-            --apiIssuer "$API_ISSUER_ID"
+          bundle exec fastlane appstore
 
       - name: Upload IPA artifact (for manual download / inspection)
         if: always()

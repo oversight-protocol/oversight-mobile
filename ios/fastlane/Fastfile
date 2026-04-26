@@ -1,0 +1,60 @@
+default_platform(:ios)
+
+platform :ios do
+  desc "Build a signed IPA and upload to TestFlight"
+  lane :appstore do
+    # Creates a temporary keychain on CI runners and quiets noise
+    setup_ci
+
+    # Single API-key handle, reused for cert/sigh/upload.
+    # cert + sigh hit ASC API /v1/* which works cleanly with API keys
+    # (unlike xcodebuild's DVTPortal auth which 401s on these flows).
+    api_key = app_store_connect_api_key(
+      key_id: ENV.fetch("API_KEY_ID"),
+      issuer_id: ENV.fetch("API_ISSUER_ID"),
+      key_filepath: ENV.fetch("API_KEY_PATH"),
+      duration: 1200,
+      in_house: false
+    )
+
+    # Distribution certificate — created if missing, downloaded if exists
+    cert(
+      api_key: api_key,
+      development: false
+    )
+
+    # App Store provisioning profile — created/refreshed for our bundle ID
+    sigh(
+      api_key: api_key,
+      app_identifier: "com.oversightprotocol.oversight",
+      platform: "ios",
+      adhoc: false,
+      development: false
+    )
+
+    # Archive + sign + export IPA. With cert + profile already in the
+    # temp keychain, automatic signing picks them up without needing
+    # -allowProvisioningUpdates.
+    build_app(
+      workspace: "Runner.xcworkspace",
+      scheme: "Runner",
+      configuration: "Release",
+      export_method: "app-store",
+      output_directory: "build/ipa",
+      output_name: "Runner.ipa",
+      clean: false,
+      silent: false,
+      export_options: {
+        method: "app-store",
+        teamID: ENV.fetch("TEAM_ID"),
+        signingStyle: "automatic"
+      }
+    )
+
+    upload_to_testflight(
+      api_key: api_key,
+      skip_waiting_for_build_processing: true,
+      ipa: "build/ipa/Runner.ipa"
+    )
+  end
+end
