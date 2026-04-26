@@ -33,9 +33,11 @@ subprojects {
                 }
             }
         }
+        // Use the modern compilerOptions DSL — `kotlinOptions { jvmTarget = "17" }`
+        // is an error in Kotlin 2.x.
         tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
-            kotlinOptions {
-                jvmTarget = "17"
+            compilerOptions {
+                jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
             }
         }
     }
