@@ -73,11 +73,17 @@ jobs:
           API_KEY_BASE64: ${{ secrets.APP_STORE_CONNECT_API_KEY_BASE64 }}
           API_KEY_ID_RAW: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
         run: |
+          # Lock umask first so the file is born 600, not 644
+          umask 077
           mkdir -p ~/.appstoreconnect/private_keys
           # PowerShell adds UTF-8 BOM (3 bytes) when piping strings into gh
           # secret set, so strip everything that isn't printable ASCII.
           KEY_ID=$(printf %s "$API_KEY_ID_RAW" | tr -cd '[:print:]')
-          echo "$API_KEY_BASE64" | base64 -d > ~/.appstoreconnect/private_keys/AuthKey_${KEY_ID}.p8
+          KEY_PATH=~/.appstoreconnect/private_keys/AuthKey_${KEY_ID}.p8
+          echo "$API_KEY_BASE64" | base64 -d > "$KEY_PATH"
+          # Belt + suspenders in case umask got reset
+          chmod 600 "$KEY_PATH"
+          chmod 700 ~/.appstoreconnect ~/.appstoreconnect/private_keys
           ls -la ~/.appstoreconnect/private_keys/
 
       - name: Build unsigned archive (sanity check on every push)
@@ -98,12 +104,15 @@ jobs:
           PROFILE_BASE64: ${{ secrets.BUILD_PROVISION_PROFILE_BASE64 }}
         run: |
           set -euo pipefail
+          umask 077
           PROFILE_DIR="$HOME/Library/MobileDevice/Provisioning Profiles"
+          PROFILE_PATH="$PROFILE_DIR/Oversight_Protocol_AppStore.mobileprovision"
           mkdir -p "$PROFILE_DIR"
-          echo "$PROFILE_BASE64" | base64 -d > "$PROFILE_DIR/Oversight_Protocol_AppStore.mobileprovision"
+          echo "$PROFILE_BASE64" | base64 -d > "$PROFILE_PATH"
+          chmod 600 "$PROFILE_PATH"
           # Sanity log — extract UUID + Name from the embedded plist
-          /usr/libexec/PlistBuddy -c 'Print UUID' /dev/stdin <<<"$(/usr/bin/security cms -D -i "$PROFILE_DIR/Oversight_Protocol_AppStore.mobileprovision")"
-          /usr/libexec/PlistBuddy -c 'Print Name' /dev/stdin <<<"$(/usr/bin/security cms -D -i "$PROFILE_DIR/Oversight_Protocol_AppStore.mobileprovision")"
+          /usr/libexec/PlistBuddy -c 'Print UUID' /dev/stdin <<<"$(/usr/bin/security cms -D -i "$PROFILE_PATH")"
+          /usr/libexec/PlistBuddy -c 'Print Name' /dev/stdin <<<"$(/usr/bin/security cms -D -i "$PROFILE_PATH")"
           ls -la "$PROFILE_DIR"
 
       - name: Build signed IPA + upload to TestFlight (tags only)
