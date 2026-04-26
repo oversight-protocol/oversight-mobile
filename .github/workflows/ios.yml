@@ -95,6 +95,12 @@ jobs:
           FASTLANE_DISABLE_COLORS: "1"
         run: |
           set -euo pipefail
+          # Diagnostic: byte counts of secret env vars (values stay masked,
+          # but lengths reveal corruption from gh secret set --body - bug).
+          # Expected: KEY_ID=10, ISSUER_ID=36, TEAM_ID=10.
+          echo "API_KEY_ID len:    $(printf %s "$API_KEY_ID"    | wc -c) (expected 10)"
+          echo "API_ISSUER_ID len: $(printf %s "$API_ISSUER_ID" | wc -c) (expected 36)"
+          echo "TEAM_ID len:       $(printf %s "$TEAM_ID"       | wc -c) (expected 10)"
           export API_KEY_PATH=~/.appstoreconnect/private_keys/AuthKey_${API_KEY_ID}.p8
 
           # Flutter assembles the .app first; Fastlane gym handles archive + sign + export
