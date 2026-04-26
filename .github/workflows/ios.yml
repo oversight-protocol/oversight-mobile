@@ -110,6 +110,11 @@ jobs:
           # -allowProvisioningUpdates lets xcodebuild create the Distribution
           # cert + provisioning profile on demand. With clean (BOM-free) secrets
           # the JWT auth works and Apple's listTeams call returns 200.
+          # CODE_SIGN_IDENTITY="Apple Distribution" forces archive-intent.
+          # Without it xcodebuild defaults to Development which needs
+          # registered devices (we have none — TestFlight delivery only).
+          # Pods retain their per-target Development settings via the
+          # Podfile post_install hook (CODE_SIGNING_ALLOWED=NO).
           xcodebuild archive \
             -workspace Runner.xcworkspace \
             -scheme Runner \
@@ -121,7 +126,8 @@ jobs:
             -authenticationKeyID "$API_KEY_ID" \
             -authenticationKeyIssuerID "$API_ISSUER_ID" \
             DEVELOPMENT_TEAM="$TEAM_ID" \
-            CODE_SIGN_STYLE=Automatic
+            CODE_SIGN_STYLE=Automatic \
+            "CODE_SIGN_IDENTITY=Apple Distribution"
 
           xcodebuild -exportArchive \
             -archivePath build/Runner.xcarchive \
