@@ -82,47 +82,63 @@ jobs:
         run: |
           flutter build ios --release --no-codesign
 
-      - name: Setup Ruby + Fastlane
-        if: startsWith(github.ref, 'refs/tags/v')
-        uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: '3.2'
-          bundler-cache: true
-          working-directory: ios
-
-      - name: Build + sign + upload via Fastlane (tags only)
+      - name: Build signed IPA + upload to TestFlight (tags only)
         if: startsWith(github.ref, 'refs/tags/v')
         env:
           API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
           API_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_API_ISSUER_ID }}
           TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
-          FASTLANE_HIDE_CHANGELOG: "1"
-          FASTLANE_DISABLE_COLORS: "1"
         run: |
           set -euo pipefail
-          # Diagnostics — verify secrets aren't carrying CRLF from PowerShell push
-          echo "API_KEY_ID len:    $(printf %s "$API_KEY_ID"    | wc -c) (want 10)"
-          echo "API_ISSUER_ID len: $(printf %s "$API_ISSUER_ID" | wc -c) (want 36)"
-          echo "TEAM_ID len:       $(printf %s "$TEAM_ID"       | wc -c) (want 10)"
-          # PowerShell pushes secrets with a UTF-8 BOM prefix; keep only
-          # printable ASCII so the .p8 path resolves and JWT claims are clean.
+          # PowerShell-pushed secrets carry a UTF-8 BOM that broke prior
+          # xcodebuild auth (401 on listTeams) by polluting JWT kid claims.
+          # Strip to printable ASCII before use.
           API_KEY_ID=$(printf %s "$API_KEY_ID" | tr -cd '[:print:]')
           API_ISSUER_ID=$(printf %s "$API_ISSUER_ID" | tr -cd '[:print:]')
           TEAM_ID=$(printf %s "$TEAM_ID" | tr -cd '[:print:]')
-          echo "After strip: KEY_ID=$(printf %s "$API_KEY_ID" | wc -c)  ISSUER_ID=$(printf %s "$API_ISSUER_ID" | wc -c)  TEAM_ID=$(printf %s "$TEAM_ID" | wc -c)"
           export API_KEY_ID API_ISSUER_ID TEAM_ID
           export API_KEY_PATH=~/.appstoreconnect/private_keys/AuthKey_${API_KEY_ID}.p8
-          ls -la ~/.appstoreconnect/private_keys/ || true
-          [ -f "$API_KEY_PATH" ] && echo "p8 exists at expected path" || echo "p8 MISSING at $API_KEY_PATH"
 
-          # Flutter assembles the .app first; Fastlane gym handles archive + sign + export
+          # Inject team ID into the committed ExportOptions.plist
+          /usr/bin/sed -i "" "s/__TEAM_ID__/${TEAM_ID}/g" ios/ExportOptions.plist
+
+          # Flutter assembles the .app; xcodebuild signs + exports + uploads
           flutter build ios --release --no-codesign
 
-          # Fastlane appstore lane: cert + sigh + gym + pilot
-          # cert/sigh use ASC API v1 endpoints which actually work with the API key,
-          # bypassing xcodebuild's flaky DVTPortal auth.
           cd ios
-          bundle exec fastlane appstore
+          # Archive with automatic signing via App Store Connect API key.
+          # -allowProvisioningUpdates lets xcodebuild create the Distribution
+          # cert + provisioning profile on demand. With clean (BOM-free) secrets
+          # the JWT auth works and Apple's listTeams call returns 200.
+          xcodebuild archive \
+            -workspace Runner.xcworkspace \
+            -scheme Runner \
+            -configuration Release \
+            -archivePath build/Runner.xcarchive \
+            -destination "generic/platform=iOS" \
+            -allowProvisioningUpdates \
+            -authenticationKeyPath "$API_KEY_PATH" \
+            -authenticationKeyID "$API_KEY_ID" \
+            -authenticationKeyIssuerID "$API_ISSUER_ID" \
+            DEVELOPMENT_TEAM="$TEAM_ID" \
+            CODE_SIGN_STYLE=Automatic
+
+          xcodebuild -exportArchive \
+            -archivePath build/Runner.xcarchive \
+            -exportOptionsPlist ExportOptions.plist \
+            -exportPath build/ipa \
+            -allowProvisioningUpdates \
+            -authenticationKeyPath "$API_KEY_PATH" \
+            -authenticationKeyID "$API_KEY_ID" \
+            -authenticationKeyIssuerID "$API_ISSUER_ID"
+
+          IPA_PATH=$(find build/ipa -name '*.ipa' | head -1)
+          echo "Uploading $IPA_PATH"
+          xcrun altool --upload-app \
+            --type ios \
+            --file "$IPA_PATH" \
+            --apiKey "$API_KEY_ID" \
+            --apiIssuer "$API_ISSUER_ID"
 
       - name: Upload IPA artifact (for manual download / inspection)
         if: always()
