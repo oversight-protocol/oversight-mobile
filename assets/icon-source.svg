@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
+  <!-- Oversight app icon — a shield (verification) with a public-log mark inside.
+       Square base for iOS/Android masking, no text (icons should never have text). -->
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#1F6FEB"/>
+      <stop offset="100%" stop-color="#0D2A5C"/>
+    </linearGradient>
+    <linearGradient id="shield" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.96"/>
+      <stop offset="100%" stop-color="#E5EAF3" stop-opacity="0.92"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Square background fills the entire 1024×1024; iOS/Android will mask. -->
+  <rect width="1024" height="1024" fill="url(#bg)"/>
+
+  <!-- Centered shield -->
+  <g transform="translate(512 512)">
+    <path d="M 0 -340
+             C 180 -340 280 -300 320 -260
+             L 320 60
+             C 320 200 200 300 0 340
+             C -200 300 -320 200 -320 60
+             L -320 -260
+             C -280 -300 -180 -340 0 -340
+             Z"
+          fill="url(#shield)"/>
+
+    <!-- Three horizontal lines = transparency log. -->
+    <g stroke="#1F6FEB" stroke-width="36" stroke-linecap="round" fill="none">
+      <line x1="-160" y1="-90"  x2="160" y2="-90"/>
+      <line x1="-160" y1="-10"  x2="160" y2="-10"/>
+      <line x1="-160" y1="70"   x2="160" y2="70"/>
+    </g>
+
+    <!-- Checkmark over the log lines = verified. -->
+    <path d="M -120 70 L -40 160 L 160 -80"
+          stroke="#22C55E" stroke-width="56"
+          stroke-linecap="round" stroke-linejoin="round"
+          fill="none"/>
+  </g>
+</svg>
