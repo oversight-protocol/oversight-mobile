@@ -19,22 +19,18 @@ subprojects {
     project.evaluationDependsOn(":app")
 }
 
-// Force Java 17 + Kotlin JVM 17 across all Flutter plugin subprojects so
-// plugins like receive_sharing_intent (which compile Kotlin at JVM target 17)
-// don't trip over the default Java 1.8 from older Flutter plugin templates.
+// Force Java 17 + Kotlin JVM 17 across all Flutter plugin subprojects.
+// Plugins like receive_sharing_intent compile their Kotlin at JVM target 17
+// while older Flutter plugin templates leave Java at 1.8 — gradle then
+// aborts with 'Inconsistent JVM-target compatibility'.
 //
-// We configure the compile *tasks* directly rather than the AGP extension —
-// the extension's compileOptions get finalized early and reject late writes
-// with 'sourceCompatibility has been finalized'.
+// jvmToolchain(17) on the kotlin extension drives BOTH the Kotlin and
+// Java compile tasks to the same toolchain. plugins.withId hooks fire on
+// plugin apply, before AGP finalizes anything.
 subprojects {
-    tasks.withType<JavaCompile>().configureEach {
-        sourceCompatibility = "17"
-        targetCompatibility = "17"
-    }
-    tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
-        compilerOptions {
-            jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
-        }
+    plugins.withId("org.jetbrains.kotlin.android") {
+        extensions.getByType<org.jetbrains.kotlin.gradle.dsl.KotlinAndroidProjectExtension>()
+            .jvmToolchain(17)
     }
 }
 
