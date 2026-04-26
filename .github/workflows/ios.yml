@@ -1,7 +1,7 @@
 name: iOS — TestFlight
 
 # Builds the iOS app on Apple Silicon macOS runners and uploads to TestFlight.
-# No local Mac required; everything runs on GitHub-hosted macos-14.
+# No local Mac required; everything runs on GitHub-hosted macos-26 (Xcode 26 / iOS 26 SDK).
 #
 # Triggers:
 #   * push to main → build only (sanity check, no upload)
@@ -31,7 +31,7 @@ env:
 jobs:
   build:
     name: Build IPA + (optionally) upload to TestFlight
-    runs-on: macos-15
+    runs-on: macos-26
     timeout-minutes: 60
 
     steps:

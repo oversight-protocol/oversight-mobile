@@ -4,6 +4,8 @@
 <dict>
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Oversight does not access your photo library. This entry exists because a transitive dependency declares the photo-library API; the app itself only verifies cryptographic bundles.</string>
 	<key>NSCameraUsageDescription</key>
