@@ -70,5 +70,70 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+	<key>LSSupportsOpeningDocumentsInPlace</key>
+	<false/>
+	<key>UIFileSharingEnabled</key>
+	<false/>
+	<key>CFBundleDocumentTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeName</key>
+			<string>Oversight Bundle</string>
+			<key>CFBundleTypeRole</key>
+			<string>Viewer</string>
+			<key>LSHandlerRank</key>
+			<string>Owner</string>
+			<key>LSItemContentTypes</key>
+			<array>
+				<string>dev.oversightprotocol.oversight</string>
+				<string>dev.oversightprotocol.sealed</string>
+			</array>
+		</dict>
+	</array>
+	<key>UTExportedTypeDeclarations</key>
+	<array>
+		<dict>
+			<key>UTTypeIdentifier</key>
+			<string>dev.oversightprotocol.oversight</string>
+			<key>UTTypeDescription</key>
+			<string>Oversight Sealed Bundle</string>
+			<key>UTTypeConformsTo</key>
+			<array>
+				<string>public.data</string>
+			</array>
+			<key>UTTypeTagSpecification</key>
+			<dict>
+				<key>public.filename-extension</key>
+				<array>
+					<string>oversight</string>
+				</array>
+				<key>public.mime-type</key>
+				<array>
+					<string>application/vnd.oversight.bundle</string>
+				</array>
+			</dict>
+		</dict>
+		<dict>
+			<key>UTTypeIdentifier</key>
+			<string>dev.oversightprotocol.sealed</string>
+			<key>UTTypeDescription</key>
+			<string>Oversight Sealed File</string>
+			<key>UTTypeConformsTo</key>
+			<array>
+				<string>public.data</string>
+			</array>
+			<key>UTTypeTagSpecification</key>
+			<dict>
+				<key>public.filename-extension</key>
+				<array>
+					<string>sealed</string>
+				</array>
+				<key>public.mime-type</key>
+				<array>
+					<string>application/vnd.oversight.sealed</string>
+				</array>
+			</dict>
+		</dict>
+	</array>
 </dict>
 </plist>

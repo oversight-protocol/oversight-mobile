@@ -50,3 +50,4 @@ android/app/release/
 # OS
 .DS_Store
 Thumbs.db
+.notes/
