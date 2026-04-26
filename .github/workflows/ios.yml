@@ -68,9 +68,13 @@ jobs:
       - name: Decode App Store Connect API key
         env:
           API_KEY_BASE64: ${{ secrets.APP_STORE_CONNECT_API_KEY_BASE64 }}
+          API_KEY_ID_RAW: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
         run: |
           mkdir -p ~/.appstoreconnect/private_keys
-          echo "$API_KEY_BASE64" | base64 -d > ~/.appstoreconnect/private_keys/AuthKey_${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}.p8
+          # Strip any trailing CRLF the secret may carry from PowerShell push
+          KEY_ID=$(printf %s "$API_KEY_ID_RAW" | tr -d '\r\n ')
+          echo "$API_KEY_BASE64" | base64 -d > ~/.appstoreconnect/private_keys/AuthKey_${KEY_ID}.p8
+          ls -la ~/.appstoreconnect/private_keys/
 
       - name: Build unsigned archive (sanity check on every push)
         if: ${{ !startsWith(github.ref, 'refs/tags/v') }}
@@ -95,7 +99,19 @@ jobs:
           FASTLANE_DISABLE_COLORS: "1"
         run: |
           set -euo pipefail
+          # Diagnostics — verify secrets aren't carrying CRLF from PowerShell push
+          echo "API_KEY_ID len:    $(printf %s "$API_KEY_ID"    | wc -c) (want 10)"
+          echo "API_ISSUER_ID len: $(printf %s "$API_ISSUER_ID" | wc -c) (want 36)"
+          echo "TEAM_ID len:       $(printf %s "$TEAM_ID"       | wc -c) (want 10)"
+          # Strip any trailing whitespace defensively (handles PowerShell CRLF)
+          API_KEY_ID=$(printf %s "$API_KEY_ID" | tr -d '\r\n ')
+          API_ISSUER_ID=$(printf %s "$API_ISSUER_ID" | tr -d '\r\n ')
+          TEAM_ID=$(printf %s "$TEAM_ID" | tr -d '\r\n ')
+          echo "After strip: KEY_ID=$(printf %s "$API_KEY_ID" | wc -c)  ISSUER_ID=$(printf %s "$API_ISSUER_ID" | wc -c)  TEAM_ID=$(printf %s "$TEAM_ID" | wc -c)"
+          export API_KEY_ID API_ISSUER_ID TEAM_ID
           export API_KEY_PATH=~/.appstoreconnect/private_keys/AuthKey_${API_KEY_ID}.p8
+          ls -la ~/.appstoreconnect/private_keys/ || true
+          [ -f "$API_KEY_PATH" ] && echo "p8 exists at expected path" || echo "p8 MISSING at $API_KEY_PATH"
 
           # Flutter assembles the .app first; Fastlane gym handles archive + sign + export
           flutter build ios --release --no-codesign
