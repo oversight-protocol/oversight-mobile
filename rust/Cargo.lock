@@ -754,6 +754,7 @@ dependencies = [
 [[package]]
 name = "oversight-container"
 version = "0.5.0"
+source = "git+https://github.com/oversight-protocol/oversight.git?tag=v0.4.8#af6f725cd7202192484a282e5bd8f85f71415d9b"
 dependencies = [
  "hex",
  "oversight-crypto",
@@ -767,6 +768,7 @@ dependencies = [
 [[package]]
 name = "oversight-crypto"
 version = "0.5.0"
+source = "git+https://github.com/oversight-protocol/oversight.git?tag=v0.4.8#af6f725cd7202192484a282e5bd8f85f71415d9b"
 dependencies = [
  "chacha20poly1305",
  "ed25519-dalek",
@@ -783,6 +785,7 @@ dependencies = [
 [[package]]
 name = "oversight-manifest"
 version = "0.5.0"
+source = "git+https://github.com/oversight-protocol/oversight.git?tag=v0.4.8#af6f725cd7202192484a282e5bd8f85f71415d9b"
 dependencies = [
  "hex",
  "oversight-crypto",
@@ -796,6 +799,7 @@ dependencies = [
 [[package]]
 name = "oversight-policy"
 version = "0.5.0"
+source = "git+https://github.com/oversight-protocol/oversight.git?tag=v0.4.8#af6f725cd7202192484a282e5bd8f85f71415d9b"
 dependencies = [
  "fs2",
  "oversight-manifest",
@@ -807,6 +811,7 @@ dependencies = [
 [[package]]
 name = "oversight-rekor"
 version = "0.5.0"
+source = "git+https://github.com/oversight-protocol/oversight.git?tag=v0.4.8#af6f725cd7202192484a282e5bd8f85f71415d9b"
 dependencies = [
  "base64",
  "ed25519-dalek",
@@ -821,6 +826,7 @@ dependencies = [
 [[package]]
 name = "oversight-tlog"
 version = "0.5.0"
+source = "git+https://github.com/oversight-protocol/oversight.git?tag=v0.4.8#af6f725cd7202192484a282e5bd8f85f71415d9b"
 dependencies = [
  "ed25519-dalek",
  "hex",
@@ -835,6 +841,7 @@ dependencies = [
 [[package]]
 name = "oversight-watermark"
 version = "0.5.0"
+source = "git+https://github.com/oversight-protocol/oversight.git?tag=v0.4.8#af6f725cd7202192484a282e5bd8f85f71415d9b"
 dependencies = [
  "rand_core",
 ]

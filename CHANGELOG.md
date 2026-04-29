@@ -2,6 +2,37 @@
 
 All notable changes to the Oversight verifier app for iOS and Android.
 
+## [0.1.12] — 2026-04-29 (Pinned to oversight v0.4.8 release)
+
+### Changed
+- **`rust/Cargo.toml`**: switched the seven oversight crates
+  (`oversight-crypto`, `oversight-manifest`, `oversight-container`,
+  `oversight-tlog`, `oversight-rekor`, `oversight-watermark`,
+  `oversight-policy`) from `path = "../../oversight-gh/..."` to
+  `git = "https://github.com/oversight-protocol/oversight.git", tag = "v0.4.8"`.
+  v0.4.8 is the minimum desktop tag that supports 32-bit Android cross-compile
+  (`armv7`, `i686`) because of the `MAX_CIPHERTEXT_BYTES` portability fix in
+  that release. The integration contract is documented at
+  [`docs/EMBEDDING.md`](https://github.com/oversight-protocol/oversight/blob/main/docs/EMBEDDING.md)
+  in the upstream repo.
+- **`.github/workflows/android.yml` and `ios.yml`**: removed the manual
+  `git clone ../oversight-gh` step. Cargo now fetches the Rust core directly
+  from the git tag, so CI no longer needs a sibling-checkout workaround.
+- **`rust/Cargo.lock`**: regenerated against the v0.4.8 git resolution. Same
+  seven oversight crates at workspace v0.5.0; only the source line changed.
+
+### Why
+- Anyone cloning `oversight-mobile` alone could not build it before. The
+  path deps required also cloning oversight and renaming the directory to
+  `oversight-gh` as a sibling. With the git tag pin, `git clone` followed
+  by `flutter run` works from a fresh checkout.
+- Reproducible mobile builds (the F-Droid story) need version-stable
+  references to the Rust core. A path dep resolves to "whatever was sitting
+  next to me at the time"; a tag pin resolves to a specific commit
+  (`af6f725c` for v0.4.8) on every machine.
+- Bumping the desktop pin is now a one-line edit in `rust/Cargo.toml` plus
+  a CHANGELOG entry, with no CI surgery required.
+
 ## [0.1.9] — 2026-04-26 (Android unblock)
 
 ### Removed

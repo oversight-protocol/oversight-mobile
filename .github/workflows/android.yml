@@ -30,8 +30,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Fetch Oversight protocol crates
-        run: git clone --depth 1 https://github.com/oversight-protocol/oversight.git ../oversight-gh
+      # Oversight Rust crates are pulled by cargo directly from the git
+      # tag pinned in rust/Cargo.toml (see docs/EMBEDDING.md upstream).
+      # No sibling-clone step needed.
 
       - uses: actions/setup-java@v4
         with:

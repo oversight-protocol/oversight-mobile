@@ -35,14 +35,12 @@ jobs:
     timeout-minutes: 60
 
     steps:
-      - name: Checkout (with submodules for oversight-rust)
+      - name: Checkout
         uses: actions/checkout@v4
 
-      # The Rust core lives in a sibling repo. Clone it at a pinned commit so
-      # builds are reproducible — bumping is an explicit PR.
-      - name: Fetch Oversight protocol crates
-        run: |
-          git clone --depth 1 https://github.com/oversight-protocol/oversight.git ../oversight-gh
+      # Oversight Rust crates are pulled by cargo directly from the git
+      # tag pinned in rust/Cargo.toml (see docs/EMBEDDING.md upstream).
+      # Bumping the desktop pin is an explicit edit to that file.
 
       - name: Setup Flutter
         uses: subosito/flutter-action@v2

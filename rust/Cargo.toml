@@ -10,14 +10,17 @@ name = "rust_lib_oversight"
 crate-type = ["staticlib", "cdylib"]
 
 [dependencies]
-# Oversight core — verifier-relevant crates only. NO seal/sign/registry-server in the mobile API.
-oversight-crypto = { path = "../../oversight-gh/oversight-rust/oversight-crypto" }
-oversight-manifest = { path = "../../oversight-gh/oversight-rust/oversight-manifest" }
-oversight-container = { path = "../../oversight-gh/oversight-rust/oversight-container" }
-oversight-tlog = { path = "../../oversight-gh/oversight-rust/oversight-tlog" }
-oversight-rekor = { path = "../../oversight-gh/oversight-rust/oversight-rekor" }
-oversight-watermark = { path = "../../oversight-gh/oversight-rust/oversight-watermark" }
-oversight-policy = { path = "../../oversight-gh/oversight-rust/oversight-policy" }
+# Oversight core, verifier-relevant crates only. NO seal/sign/registry-server in the mobile API.
+# Pinned to the v0.4.8 desktop release tag per docs/EMBEDDING.md in the
+# oversight repo. v0.4.8 is the minimum tag that supports 32-bit Android
+# cross-compile (armv7, i686) because of the MAX_CIPHERTEXT_BYTES portability fix.
+oversight-crypto    = { git = "https://github.com/oversight-protocol/oversight.git", tag = "v0.4.8" }
+oversight-manifest  = { git = "https://github.com/oversight-protocol/oversight.git", tag = "v0.4.8" }
+oversight-container = { git = "https://github.com/oversight-protocol/oversight.git", tag = "v0.4.8" }
+oversight-tlog      = { git = "https://github.com/oversight-protocol/oversight.git", tag = "v0.4.8" }
+oversight-rekor     = { git = "https://github.com/oversight-protocol/oversight.git", tag = "v0.4.8" }
+oversight-watermark = { git = "https://github.com/oversight-protocol/oversight.git", tag = "v0.4.8" }
+oversight-policy    = { git = "https://github.com/oversight-protocol/oversight.git", tag = "v0.4.8" }
 
 flutter_rust_bridge = "=2.12.0"
 serde = { version = "1", features = ["derive"] }
