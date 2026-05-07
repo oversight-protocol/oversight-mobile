@@ -21,7 +21,7 @@ Verify document provenance.
 
 ### Promotional Text
 ```
-Open-source. Offline. Bit-identical with the desktop CLI. Verify any Oversight-attested document against a public, append-only log — no account, no telemetry.
+Open-source. Offline. Bit-identical with the desktop CLI. Verify signed Oversight bundles on-device — no account, no telemetry.
 ```
 *(170 char max — fits)*
 
@@ -29,13 +29,14 @@ Open-source. Offline. Bit-identical with the desktop CLI. Verify any Oversight-a
 ```
 Oversight verifies that a document is exactly what its issuer claims, using cryptography that anyone can audit.
 
-Open the app, pick an .oversight bundle, and see in seconds whether its signature is valid, who issued it, and what hash was published to the public Sigstore Rekor transparency log. The verification runs entirely on your device using the same Rust code that powers the desktop command-line tool — same answer, every time.
+Open the app, pick a .oversight or .sealed bundle, and see in seconds whether its signature is valid, who issued it, and what content hash the signed manifest binds. The verification runs entirely on your device using the same Rust code that powers the desktop command-line tool — same answer, every time.
 
 WHAT YOU CAN VERIFY
 • The cryptographic signature on the issuer's manifest
 • The exact content hash and original filename
 • The issuer's public key fingerprint
 • When and under what suite the document was sealed
+• Whether the bundle carries recipient and watermark metadata
 
 WHAT THE APP DOES NOT DO
 • It does not phone home. There is no server, no analytics SDK, no account.
@@ -57,7 +58,7 @@ The Oversight protocol is Apache 2.0. So is this app.
 
 ### Keywords
 ```
-verify,provenance,sigstore,rekor,signature,attestation,journalism,evidence,audit
+verify,provenance,signature,attestation,journalism,evidence,audit,offline,open source
 ```
 *(100 char max — fits)*
 

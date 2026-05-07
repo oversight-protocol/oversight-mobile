@@ -66,6 +66,15 @@ jobs:
       - name: Flutter pub get
         run: flutter pub get
 
+      - name: Flutter analyze
+        run: flutter analyze
+
+      - name: Flutter tests
+        run: flutter test
+
+      - name: Rust FFI tests
+        run: cargo test --manifest-path rust/Cargo.toml
+
       - name: Decode App Store Connect API key
         env:
           API_KEY_BASE64: ${{ secrets.APP_STORE_CONNECT_API_KEY_BASE64 }}

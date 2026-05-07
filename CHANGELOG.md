@@ -2,13 +2,15 @@
 
 All notable changes to the Oversight verifier app for iOS and Android.
 
-## Unreleased
+## [0.1.13] — 2026-05-07 (Receipt copy + v0.4.9 Rust core)
 
 ### Added
 - Result screen: added a copy-to-clipboard receipt action next to the existing
   share action, so a verifier can paste the human summary plus JSON receipt
   into a ticket, message, or notes app without invoking the platform share
   sheet.
+- CI: Android and iOS workflows now run `flutter analyze`, `flutter test`, and
+  `cargo test --manifest-path rust/Cargo.toml` before platform packaging.
 
 ### Changed
 - Rust core pin: moved the seven verifier-safe `oversight-rust` crates from
@@ -19,6 +21,8 @@ All notable changes to the Oversight verifier app for iOS and Android.
 - File picker: restricts manual selection to Oversight bundle extensions
   (`.oversight` and `.sealed`) and updates first-run/home copy to name both
   supported bundle forms.
+- Store/release docs: clarified that v0.1.x verifies bundles offline and does
+  not perform live Rekor lookups yet.
 - `.gitignore`: extends local coordination-note ignores for Codex/Claude
   handoff files so private local notes do not appear as public repo changes.
 

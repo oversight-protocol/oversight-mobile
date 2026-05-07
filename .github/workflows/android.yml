@@ -58,6 +58,15 @@ jobs:
 
       - run: flutter pub get
 
+      - name: Flutter analyze
+        run: flutter analyze
+
+      - name: Flutter tests
+        run: flutter test
+
+      - name: Rust FFI tests
+        run: cargo test --manifest-path rust/Cargo.toml
+
       - name: Build debug APK (sanity)
         if: ${{ !startsWith(github.ref, 'refs/tags/v') }}
         run: flutter build apk --debug --target-platform android-arm64

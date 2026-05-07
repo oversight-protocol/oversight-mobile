@@ -1,8 +1,8 @@
 # Releasing Oversight
 
-The full release loop runs in GitHub Actions. You don't need a Mac. You don't
-even need to clone the repo to ship a build — push a tag and a TestFlight build
-appears.
+The full release loop runs in GitHub Actions. You don't need a Mac. Pushes to
+`main` run analysis, tests, and unsigned platform sanity builds. Tags run the
+same checks, then produce release artifacts; iOS tags also upload to TestFlight.
 
 ## One-time setup
 
@@ -79,14 +79,16 @@ updates to your Play Store listing — only a brand new app.
 ## Cutting a release
 
 ```bash
-# bump version in pubspec.yaml: e.g. version: 0.1.0+1
-git tag v0.1.0
-git push origin v0.1.0
+# bump version in pubspec.yaml, e.g. version: 0.1.13+13
+# move CHANGELOG.md Unreleased notes into the same version
+git tag v0.1.13
+git push origin v0.1.13
 ```
 
 GitHub Actions does the rest:
-- iOS workflow builds + signs + uploads to TestFlight (~15 min on macos-14)
-- Android workflow builds the signed AAB (~8 min on ubuntu-latest)
+- both workflows run `flutter analyze`, `flutter test`, and Rust FFI tests
+- iOS workflow builds + signs + uploads to TestFlight on tags (~15 min on `macos-26`)
+- Android workflow builds the signed AAB on tags (~8 min on `ubuntu-latest`)
 
 Both AAB and IPA are also uploaded as workflow artifacts so you can grab them
 from the Actions tab if you need to inspect.

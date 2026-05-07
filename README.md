@@ -6,9 +6,9 @@ Mobile companion to the [Oversight Protocol](https://github.com/oversight-protoc
 
 ## What it does
 
-- **Verify** any Oversight-attested document — scan a QR, paste a hash, or open a `.oversight` / `.sealed` bundle
-- **Check the public log** — pulls live from [Sigstore Rekor](https://docs.sigstore.dev/logging/overview/) and verifies cryptographic inclusion
-- **No telemetry. No accounts. No server.** The app does pure cryptography against a public, append-only log
+- **Verify** any Oversight-attested document — open a `.oversight` / `.sealed` bundle and check the signed manifest
+- **Inspect provenance locally** — issuer, original filename, content hash, signature status, suite, and watermark metadata
+- **No telemetry. No accounts. No server.** The app does pure cryptography against bytes you choose on this device
 - **Bit-identical** verification with the desktop CLI — same Rust core, same answer, every time
 
 ## What this is not
@@ -21,9 +21,9 @@ Mobile companion to the [Oversight Protocol](https://github.com/oversight-protoc
 
 | Platform | Channel | Status |
 |---|---|---|
-| iOS | TestFlight (internal) | **Live — v0.1.11** |
+| iOS | TestFlight (internal) | **Live — v0.1.11; v0.1.13 ready to tag** |
 | iOS | App Store | After internal beta passes external review |
-| Android | Internal track / debug APK | **Live — v0.1.11** |
+| Android | Internal track / debug APK | **Live — v0.1.11; v0.1.13 ready to tag** |
 | Android | Google Play | After internal beta |
 | Android (no Google) | F-Droid | Planned |
 | Anyone | GitHub Releases (`.apk` + reproducible build manifest) | Planned |
