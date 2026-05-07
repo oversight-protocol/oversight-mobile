@@ -11,16 +11,16 @@ crate-type = ["staticlib", "cdylib"]
 
 [dependencies]
 # Oversight core, verifier-relevant crates only. NO seal/sign/registry-server in the mobile API.
-# Pinned to the v0.4.8 desktop release tag per docs/EMBEDDING.md in the
-# oversight repo. v0.4.8 is the minimum tag that supports 32-bit Android
-# cross-compile (armv7, i686) because of the MAX_CIPHERTEXT_BYTES portability fix.
-oversight-crypto    = { git = "https://github.com/oversight-protocol/oversight.git", tag = "v0.4.8" }
-oversight-manifest  = { git = "https://github.com/oversight-protocol/oversight.git", tag = "v0.4.8" }
-oversight-container = { git = "https://github.com/oversight-protocol/oversight.git", tag = "v0.4.8" }
-oversight-tlog      = { git = "https://github.com/oversight-protocol/oversight.git", tag = "v0.4.8" }
-oversight-rekor     = { git = "https://github.com/oversight-protocol/oversight.git", tag = "v0.4.8" }
-oversight-watermark = { git = "https://github.com/oversight-protocol/oversight.git", tag = "v0.4.8" }
-oversight-policy    = { git = "https://github.com/oversight-protocol/oversight.git", tag = "v0.4.8" }
+# Pinned to the v0.4.9 desktop release tag per docs/EMBEDDING.md in the
+# oversight repo. v0.4.9 keeps the 32-bit Android portability fix from v0.4.8
+# and adds the Rust registry v1, hybrid viewer, and watermark round-trip fixes.
+oversight-crypto    = { git = "https://github.com/oversight-protocol/oversight.git", tag = "v0.4.9" }
+oversight-manifest  = { git = "https://github.com/oversight-protocol/oversight.git", tag = "v0.4.9" }
+oversight-container = { git = "https://github.com/oversight-protocol/oversight.git", tag = "v0.4.9" }
+oversight-tlog      = { git = "https://github.com/oversight-protocol/oversight.git", tag = "v0.4.9" }
+oversight-rekor     = { git = "https://github.com/oversight-protocol/oversight.git", tag = "v0.4.9" }
+oversight-watermark = { git = "https://github.com/oversight-protocol/oversight.git", tag = "v0.4.9" }
+oversight-policy    = { git = "https://github.com/oversight-protocol/oversight.git", tag = "v0.4.9" }
 
 flutter_rust_bridge = "=2.12.0"
 serde = { version = "1", features = ["derive"] }

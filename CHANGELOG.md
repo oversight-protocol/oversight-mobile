@@ -11,6 +11,11 @@ All notable changes to the Oversight verifier app for iOS and Android.
   sheet.
 
 ### Changed
+- Rust core pin: moved the seven verifier-safe `oversight-rust` crates from
+  upstream tag `v0.4.8` to `v0.4.9`, bringing the mobile verifier onto the tag
+  that includes the Rust registry v1 work, hybrid viewer follow-up, and Rust
+  watermark round-trip fixes while preserving the v0.4.8 Android portability
+  baseline.
 - File picker: restricts manual selection to Oversight bundle extensions
   (`.oversight` and `.sealed`) and updates first-run/home copy to name both
   supported bundle forms.
