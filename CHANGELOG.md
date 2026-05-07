@@ -9,8 +9,9 @@ All notable changes to the Oversight verifier app for iOS and Android.
   share action, so a verifier can paste the human summary plus JSON receipt
   into a ticket, message, or notes app without invoking the platform share
   sheet.
-- CI: Android and iOS workflows now run `flutter analyze`, `flutter test`, and
-  `cargo test --manifest-path rust/Cargo.toml` before platform packaging.
+- CI: Android and iOS workflows now run `flutter analyze lib test`,
+  `flutter test`, and `cargo test --manifest-path rust/Cargo.toml` before
+  platform packaging.
 
 ### Changed
 - Rust core pin: moved the seven verifier-safe `oversight-rust` crates from

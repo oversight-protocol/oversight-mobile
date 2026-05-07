@@ -86,7 +86,7 @@ git push origin v0.1.13
 ```
 
 GitHub Actions does the rest:
-- both workflows run `flutter analyze`, `flutter test`, and Rust FFI tests
+- both workflows run `flutter analyze lib test`, `flutter test`, and Rust FFI tests
 - iOS workflow builds + signs + uploads to TestFlight on tags (~15 min on `macos-26`)
 - Android workflow builds the signed AAB on tags (~8 min on `ubuntu-latest`)
 
