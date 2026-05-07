@@ -2,6 +2,21 @@
 
 All notable changes to the Oversight verifier app for iOS and Android.
 
+## Unreleased
+
+### Added
+- Result screen: added a copy-to-clipboard receipt action next to the existing
+  share action, so a verifier can paste the human summary plus JSON receipt
+  into a ticket, message, or notes app without invoking the platform share
+  sheet.
+
+### Changed
+- File picker: restricts manual selection to Oversight bundle extensions
+  (`.oversight` and `.sealed`) and updates first-run/home copy to name both
+  supported bundle forms.
+- `.gitignore`: extends local coordination-note ignores for Codex/Claude
+  handoff files so private local notes do not appear as public repo changes.
+
 ## [0.1.12] — 2026-04-29 (Pinned to oversight v0.4.8 release)
 
 ### Changed

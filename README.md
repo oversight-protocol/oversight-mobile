@@ -6,7 +6,7 @@ Mobile companion to the [Oversight Protocol](https://github.com/oversight-protoc
 
 ## What it does
 
-- **Verify** any Oversight-attested document — scan a QR, paste a hash, or open a `.oversight` bundle
+- **Verify** any Oversight-attested document — scan a QR, paste a hash, or open a `.oversight` / `.sealed` bundle
 - **Check the public log** — pulls live from [Sigstore Rekor](https://docs.sigstore.dev/logging/overview/) and verifies cryptographic inclusion
 - **No telemetry. No accounts. No server.** The app does pure cryptography against a public, append-only log
 - **Bit-identical** verification with the desktop CLI — same Rust core, same answer, every time

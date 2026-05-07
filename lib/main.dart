@@ -23,6 +23,7 @@ const _githubUrl = 'https://github.com/oversight-protocol/oversight';
 const _onboardingDoneKey = 'onboarding_done_v1';
 const _historyKey = 'verify_history_v1';
 const _historyMax = 20;
+const _bundleExtensions = ['oversight', 'sealed'];
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -105,9 +106,9 @@ class _OnboardingState extends State<_Onboarding> {
       icon: Icons.shield_outlined,
       title: 'What Oversight does',
       body:
-          'Oversight verifies that a sealed file (.oversight) was signed by a '
-          'specific person and has not been altered. The check happens on '
-          'this device. Nothing is uploaded.',
+          'Oversight verifies that a sealed file (.oversight or .sealed) was '
+          'signed by a specific person and has not been altered. The check '
+          'happens on this device. Nothing is uploaded.',
     ),
     _OnboardPage(
       icon: Icons.inbox_outlined,
@@ -289,7 +290,9 @@ class _HomePageState extends State<HomePage> {
     });
     try {
       final picked = await FilePicker.pickFiles(
-        dialogTitle: 'Pick an .oversight bundle',
+        dialogTitle: 'Pick an Oversight bundle',
+        type: FileType.custom,
+        allowedExtensions: _bundleExtensions,
         withData: true,
       );
       if (picked == null || picked.files.isEmpty) {
@@ -563,8 +566,9 @@ class _EmptyHint extends StatelessWidget {
             SizedBox(height: 8),
             Text(
               'Tap "Try sample" above to see a valid and a tampered bundle. '
-              'When someone shares a real .oversight file with you (email, '
-              'AirDrop, Messages), tapping it should open this app directly.',
+              'When someone shares a real Oversight bundle (.oversight or '
+              '.sealed) with you, tapping it from email, AirDrop, or Messages '
+              'should open this app directly.',
               style: TextStyle(color: Colors.white70, height: 1.35),
             ),
           ],
@@ -704,14 +708,24 @@ class ResultPage extends StatelessWidget {
     return lines.join('\n');
   }
 
+  String _receiptText() {
+    return '${_humanSummary()}\n\n--- JSON receipt ---\n${_receiptJson()}';
+  }
+
   Future<void> _share(BuildContext context) async {
-    final summary = _humanSummary();
-    final json = _receiptJson();
     await SharePlus.instance.share(ShareParams(
       title: 'Oversight verification — $filename',
-      text: '$summary\n\n--- JSON receipt ---\n$json',
+      text: _receiptText(),
       subject: '${_ok ? "Verified" : "Not verified"}: $filename',
     ));
+  }
+
+  Future<void> _copyReceipt(BuildContext context) async {
+    await Clipboard.setData(ClipboardData(text: _receiptText()));
+    if (!context.mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Receipt copied')),
+    );
   }
 
   @override
@@ -729,6 +743,11 @@ class ResultPage extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Verification'),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.copy),
+            tooltip: 'Copy receipt',
+            onPressed: () => _copyReceipt(context),
+          ),
           IconButton(
             icon: const Icon(Icons.ios_share),
             tooltip: 'Share receipt',

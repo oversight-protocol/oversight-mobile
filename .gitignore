@@ -51,3 +51,11 @@ android/app/release/
 .DS_Store
 Thumbs.db
 .notes/
+
+# Local handoff / onboarding notes (Codex <-> Claude)
+SESSION_*.md
+HANDOFF_*.md
+*_HANDOFF.md
+CODEX_*.md
+CLAUDE_*.md
+START_HERE.md
